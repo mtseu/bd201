@@ -1,0 +1,19 @@
+[mtseu@sandbox-hdp ~]$
+[mtseu@sandbox-hdp ~]$ kafka-topics.sh --list --zookeeper $(hostname):2181
+ATLAS_ENTITIES
+ATLAS_HOOK
+__consumer_offsets
+[mtseu@sandbox-hdp ~]$ kafka-topics.sh --zookeeper $(hostname):2181 --create --topic "m1-t2-topic" --partitions 2 --replication-factor 1
+Created topic "m1-t2-topic".
+[mtseu@sandbox-hdp ~]$ kafka-topics.sh --list --zookeeper $(hostname):2181                                                       ATLAS_ENTITIES
+ATLAS_HOOK
+__consumer_offsets
+m1-t2-topic
+[mtseu@sandbox-hdp ~]$ kafka-console-producer.sh --broker-list $(hostname):6667 --topic "m1-t2-topic" --sync
+>hey there!
+>this is the first test message!
+>this is the second test message!
+>good bye!
+>^C[mtseu@sandbox-hdp ~]$
+[mtseu@sandbox-hdp ~]$
+
