@@ -1,0 +1,26 @@
+$ ssh -p 2222 mtseu@localhost
+mtseu@localhost's password:
+Last login: Fri Aug 30 11:42:07 2019 from 172.18.0.3
+[mtseu@sandbox-hdp ~]$ kafka-console-consumer.sh --bootstrap-server $(hostname):6667 --topic "m1-t2-topic" --from-beginning
+hey there!
+this is the second test message!
+this is the first test message!
+good bye!
+^CProcessed a total of 4 messages
+[mtseu@sandbox-hdp ~]$ kafka-consumer-groups.sh --bootstrap-server $(hostname):6667 --list
+Note: This will not show information about old Zookeeper-based consumers.
+console-consumer-41557
+atlas
+ranger_entities_consumer
+[mtseu@sandbox-hdp ~]$ kafka-consumer-groups.sh --bootstrap-server $(hostname):6667 --describe --group console-consumer-44727
+Note: This will not show information about old Zookeeper-based consumers.
+Error: Consumer group 'console-consumer-44727' does not exist.
+[mtseu@sandbox-hdp ~]$ kafka-consumer-groups.sh --bootstrap-server $(hostname):6667 --describe --group console-consumer-41557
+Note: This will not show information about old Zookeeper-based consumers.
+Consumer group 'console-consumer-41557' has no active members.
+
+TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+m1-t2-topic     0          2               2               0               -               -               -
+m1-t2-topic     1          2               2               0               -               -               -
+[mtseu@sandbox-hdp ~]$
+
