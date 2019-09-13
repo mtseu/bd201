@@ -5,8 +5,15 @@
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds
  */
 
-ext.hadoopTarballUrl = 'https://www-us.apache.org/dist/hadoop/common/hadoop-3.2.0/hadoop-3.2.0.tar.gz'
-ext.hadoopTarBallDir = './hadoop/'
+plugins {
+	id 'com.bmuschko.docker-remote-api' version '4.10.0'
+}
+
+ext {
+	hadoopTarballUrl = 'https://www-us.apache.org/dist/hadoop/common/hadoop-3.2.0/hadoop-3.2.0.tar.gz'
+	hadoopDockerImageBuildContext = './build/hadoop/'
+	hadoopDockerImageTag = 'hdfs/ha/base'
+}
 
 repositories {
     ivy {
@@ -16,6 +23,8 @@ repositories {
         }
         
     }
+    
+    mavenCentral()
 }
 
 configurations {
@@ -26,23 +35,22 @@ dependencies {
 	hadoopTarBall 'common:hadoop:3.2.0@tar.gz'
 }
 
-
-task resolveHadoopTarBall {
-	configurations.hadoopTarBall.resolve()
-}
-
-
-task preapreHadoopTarball (type: Copy, dependsOn: [ resolveHadoopTarBall ]) {
-	/* dependsOn configation(hadoopTarBall) */
-	println 'The URL to download the Hadoop' + project.ext.hadoopTarballUrl
-	println configurations.hadoopTarBall.getAllArtifacts()
-	/*
-	 each { 
-	    println it
-	} 
-	*/
-
+task prepareHadoopTarball (type: Copy) { 
+	println 'The URL to download the Hadoop:' + project.ext.hadoopTarballUrl
 
 	from configurations.hadoopTarBall
-	into project.ext.hadoopTarBallDir
+	into project.ext.hadoopDockerImageBuildContext
 }
+
+task prepareDockerFile(type: Copy) {
+	from 'Dockerfile'
+	into project.ext.hadoopDockerImageBuildContext
+}
+
+import com.bmuschko.gradle.docker.tasks.image.*
+
+task buildHadoopImage(type: DockerBuildImage, dependsOn: [ prepareHadoopTarball, prepareDockerFile ]) {
+	inputDir = file(project.ext.hadoopDockerImageBuildContext)
+	tags.add(project.ext.hadoopDockerImageTag)
+}
+
